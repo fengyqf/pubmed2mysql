@@ -1,0 +1,141 @@
+
+# PubmedArticleSet
+
+## PubmedArticle
+parsed to ParseSinglePubmedArticle.buff as OrderedDict
+
+all element parsed to flat variables, or list[...] contains OrderedDict, or list(...) contains single value
+
+
+-------------------------------
+PMID                                    int
+
+Status                                  varchar(20)    enum
+IndexingMethod                          varchar(20)
+Owner                                   varchar(10)    enum
+
+DateCompleted                           varchar(8)     yyyymmdd
+DateRevised                             varchar(8)     yyyymmdd
+
+PubModel                                varchar(25)    enum
+Journal_Title                           varchar(250)
+Journal_ISOAbbreviation                 varchar(250)
+IssnType                                varchar(10)    (Electronic | Print)
+ISSN                                    varchar(10)    enum
+CitedMedium                             varchar(10)    (Internet | Print)
+Issue                                   varchar(20)
+Volume                                  varchar(20)
+
+PubDate                                 varchar(8)     yyyymmdd
+PubDate_Year                            smallint
+PubDate_Month                           tinyint
+
+MedlinePgn                              varchar(50)
+ELocationID_pii                         varchar(100)
+ELocationID_doi                         varchar(100)
+
+Abstract[...]
+    Label                               varchar(250)
+    NlmCategory                         varchar(20)    enum
+    AbstractText                        mediumtext
+
+CopyrightInformation                    mediumtext
+
+AuthorList[...]
+    ValidYN                             varchar(1)     Y | N
+    LastName                            varchar(50)
+    ForeName                            varchar(50)
+    Initials                            varchar(20)
+    Suffix                              varchar(20)
+    CollectiveName                      mediumtext   # use CollectiveName when L.F.I.S all null
+    Identifier                          mediumtext
+    Identifier_Source                   varchar(20)
+    Affiliation                         mediumtext
+
+Language                                varchar(10)
+
+DataBankList[...]
+    DataBankName                        varchar(50)
+    AccessionNumber                     varchar(50)
+
+GrantList_CompleteYN                    varchar(1)     Y | N
+GrantList[...]
+    GrantID                             varchar(50)
+    Acronym                             varchar(50)
+    Agency                              varchar(50)
+    Country                             varchar(50)
+
+PublicationTypeList
+    PublicationType_text                varchar(50)
+    PublicationType_UI                  varchar(50)
+
+ArticleDate_DateType                    varchar(10)    #FIXED "Electronic"
+ArticleDate                             varchar(8)     yyyymmdd
+MedlineJournalInfo_Country              varchar(50)
+MedlineJournalInfo_MedlineTA            varchar(250)
+MedlineJournalInfo_NlmUniqueID          unsigned int
+MedlineJournalInfo_ISSNLinking          varchar(10)
+
+ChemicalList[...]
+    RegistryNumber                      varchar(50)
+    NameOfSubstance_UI                  varchar(50)
+    NameOfSubstance_text                varchar(50)
+
+CitationSubset[...]
+    CitationSubset                     varchar(10)
+
+CommentsCorrectionsList[...]
+    RefType                             varchar(30)    enum
+    RefSource                           varchar(250)
+    PMID                                int
+    Note                                mediumtext
+
+MeshHeadingList[...]
+    DescriptorName_text                 varchar(250)
+    DescriptorName_UI                   varchar(20)
+    DescriptorName_MajorTopicYN         varchar(1)
+    QualifierName_text                  varchar(250)
+    QualifierName_UI                    varchar(20)
+    QualifierName_MajorTopicYN          varchar(1)
+
+CoiStatement                            mediumtext
+
+History[...]
+    PubStatus                           varchar(20)    enum
+    date                                varchar(12)    yyyymmddhhii
+
+PubMedPubDate_pubmed                    varchar(12)    yyyymmddhhii
+PubMedPubDate_medline                   varchar(12)    yyyymmddhhii
+PubMedPubDate_entrez                    varchar(12)    yyyymmddhhii
+
+PublicationStatus                       varchar(50)
+PublicationStatus_UI                    varchar(50)
+
+ArticleIdList[...]
+    IdType                              varchar(20)    enum
+    ArticleId                           varchar(100)
+
+ArticleId_pubmed                        varchar(100)
+ArticleId_doi                           varchar(100)
+ArticleId_pmc                           varchar(100)
+
+KeywordList[...]
+    Keyword                             varchar(250)
+    MajorTopicYN                        varchar(1)     Y | N
+    Owner                               varchar(10)    enum
+
+InvestigatorList[...]
+    LastName                            varchar(50)
+    ForeName                            varchar(50)
+    Initials                            varchar(50)
+    Suffix                              varchar(50)
+    Identifier                          mediumtext
+    AffiliationInfo                     mediumtext
+
+ReferenceList[...]
+    Citation                            varchar(250)
+    ArticleId_pmid                      int
+
+
+
+
