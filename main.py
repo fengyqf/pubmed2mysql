@@ -623,7 +623,9 @@ class PersistenceBase():
         self.db=self.cursor.fetchone()[0]
 
     def persistence(self,data):
+        # main table values; and cache all sub table values
         main={}
+        sub={}
         for key in data:
             if isinstance(data[key], list):
                 main['%s__cnt'%key]=len(data[key])
@@ -632,21 +634,39 @@ class PersistenceBase():
                     if 'PMID' not in row:
                         row['PMID']=data['PMID']
                     values.append(row)
-                self.save('%s%s'%(self.prefix,key), values)
+                table='%s%s'%(self.prefix,key)
+                sub[table]=values
             else:
                 main[key]=data[key]
-        self.save(self.main_table, main)
-        pass
-
-    def save(self,table,values):
-        if isinstance(values,list):
-            for val in values:
-                self._save_one(table,val)
-        else:
-            self._save_one(table,values)
+        self.save_main(main)
+        for table in sub:
+            self.save_sub(table, sub[table])
         return None
 
-    def _save_one(self,table,values=OrderedDict()):
+    def save_main(self,values):
+        sql="INSERT INTO `%s` (`%s`) VALUES(%s)"%(self.main_table
+                , '`, `'.join(values.keys())
+                , ', '.join([r'%s']*len(values))
+            )
+        val=[values[it] for it in values]
+        try:
+            self.cursor.execute(sql,val)
+        except pymysql.err.IntegrityError:
+            self.clean_pmid(values['PMID'])
+            self.cursor.execute(sql,val)
+        except:
+            print(sql)
+            print(val)
+            traceback.print_exc()
+            sys.exit()
+        return None
+
+    def save_sub(self,table,rows):
+        for row in rows:
+            self._save_one_sub(table,row)
+        return None
+
+    def _save_one_sub(self,table,values=OrderedDict()):
         sql="INSERT INTO `%s` (`%s`) VALUES(%s)"%(table
                 , '`, `'.join(values.keys())
                 , ', '.join([r'%s']*len(values))
@@ -659,29 +679,43 @@ class PersistenceBase():
             print(val)
             traceback.print_exc()
             sys.exit()
-
         self.conn.commit()
         return None
 
-    #def load_default_value(self,table_name):
-    #    sql="SELECT COLUMN_NAME,COLUMN_DEFAULT FROM `INFORMATION_SCHEMA`.`COLUMNS` \
-    #        WHERE `TABLE_SCHEMA`='%s' AND `TABLE_NAME`='%s'"%(self.db,table_name)
+    def clean_pmid(self,pmid):
+        for table in self.sub_tables+[self.main_table]:
+            sql="DELETE FROM %s WHERE `PMID`=%s"%(table,pmid)
+            try:
+                self.cursor.execute(sql)
+            except:
+                print(sql)
+                traceback.print_exc()
+                sys.exit()
+        return None
+
 
 
 class PersistencePubmedArticle(PersistenceBase):
     prefix='pm_'
-    main_table="%smain"%prefix
+    subs=['Abstract','AuthorList','DataBankList','GrantList'
+        ,'PublicationTypeList','ChemicalList','CitationSubset'
+        ,'CommentsCorrectionsList','MeshHeadingList','History','ArticleIdList'
+        ,'KeywordList','InvestigatorList','ReferenceList'
+        ]
     def __init__(self, conn):
         super(PersistencePubmedArticle, self).__init__(conn)
+        self.main_table="%smain"%self.prefix
+        self.sub_tables=["%s%s"%(self.prefix,it) for it in self.subs]
 
 
 
 # ------------------------------------------------------------------------------
 def parse_xml_and_convert(file_path,conn):
-    print("\nparsing file: %s"%file_path,end='',flush=True)
+    print("reading file: %s"%file_path)
     pers_article=PersistencePubmedArticle(conn)
     pma=EtPmaIter(file_path)
     i=0
+    print('parsing...',end='',flush=True)
     for art in pma:
         psr=ParsePubmedDocument(art)
         if psr.type=='PubmedArticle':
@@ -693,7 +727,7 @@ def parse_xml_and_convert(file_path,conn):
         else:
             raise Exception('UNKNOWN block: %s'%psr.type)
         i+=1
-    print('\n%s lines converted'%i)
+    print('\n%s lines converted\n'%i)
 
 
 def run_parse_xml_files(xml_files_path,conn):
