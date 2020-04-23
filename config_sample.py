@@ -6,5 +6,9 @@ db_user     = 'root'
 db_password = ''
 db_dbname   = 'mypubmed'
 
+# ignore db error when insert, else stop and exit
+ignore_db_error = True
+
+
 xml_files_path  = '/cygdrive/e/download/pubmed*.gz'
 
