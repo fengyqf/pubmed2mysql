@@ -658,7 +658,8 @@ class PersistenceBase():
             print(sql)
             print(val)
             traceback.print_exc()
-            sys.exit()
+            if not config.ignore_db_error:
+                sys.exit()
         return None
 
     def save_sub(self,table,rows):
@@ -678,7 +679,8 @@ class PersistenceBase():
             print(sql)
             print(val)
             traceback.print_exc()
-            sys.exit()
+            if not config.ignore_db_error:
+                sys.exit()
         self.conn.commit()
         return None
 
