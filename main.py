@@ -192,9 +192,7 @@ class ParseSingleBase():
 
     def find_all_join_text_in_ele(self,ele,xpath,attr='text'):
         tmp=ele.findall(xpath)
-        val=[]
-        for i in range(len(tmp)):
-            val.append(tmp[i].text)
+        val=[it.text for it in tmp if isinstance(it.text,str)]
         return ' '.join(val)
 
 
@@ -733,7 +731,9 @@ def parse_xml_and_convert(file_path,conn):
 
 
 def run_parse_xml_files(xml_files_path,conn):
-    for f in glob.glob(xml_files_path):
+    files=glob.glob(xml_files_path)
+    files.sort()
+    for f in files:
         parse_xml_and_convert(f,conn)
 
 
