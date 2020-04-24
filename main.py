@@ -10,11 +10,13 @@ from collections import OrderedDict
 import re
 import pymysql
 import traceback
-import config
 import gzip
 import glob
 
-
+try:
+    import config
+except ImportError:
+    print('config.py not found. Please create it from config_sample.py')
 
 class CfgDocLevelType():
     def __init__(self):
@@ -740,7 +742,7 @@ def run_parse_xml_files(xml_files_path,conn):
 
 # ------------------------------------------------------------------------------
 
-if __name__ == '__main__':
+def start():
     file_path = config.xml_files_path
     conn=pymysql.connect(config.db_host
                         ,config.db_user
@@ -750,3 +752,11 @@ if __name__ == '__main__':
     run_parse_xml_files(config.xml_files_path,conn)
 
 
+if __name__ == '__main__':
+    start()
+
+'''
+python -m cProfile -o profile.out main.py
+python -m pstats profile.out
+
+'''
