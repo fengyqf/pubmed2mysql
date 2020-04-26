@@ -18,35 +18,35 @@ DateCompleted                           varchar(8)     yyyymmdd
 DateRevised                             varchar(8)     yyyymmdd
 
 PubModel                                varchar(25)    enum
-Journal_Title                           varchar(250)
-Journal_ISOAbbreviation                 varchar(250)
+Journal_Title                           varchar(255)
+Journal_ISOAbbreviation                 varchar(255)
 IssnType                                varchar(10)    (Electronic | Print)
-ISSN                                    varchar(10)    enum
+ISSN                                    varchar(10)
 CitedMedium                             varchar(10)    (Internet | Print)
-Issue                                   varchar(20)
-Volume                                  varchar(20)
+Issue                                   varchar(100)
+Volume                                  varchar(100)
 
 PubDate                                 varchar(8)     yyyymmdd
 PubDate_Year                            smallint
 PubDate_Month                           tinyint
 
 MedlinePgn                              varchar(50)
-ELocationID_pii                         varchar(100)
+ELocationID_pii                         varchar(255)
 ELocationID_doi                         varchar(100)
 
 Abstract[...]
-    Label                               varchar(250)
+    Label                               varchar(255)
     NlmCategory                         varchar(20)    enum
     AbstractText                        mediumtext
 
 CopyrightInformation                    mediumtext
 
 AuthorList[...]
-    ValidYN                             varchar(1)     Y | N
-    LastName                            varchar(50)
-    ForeName                            varchar(50)
-    Initials                            varchar(20)
-    Suffix                              varchar(20)
+    ValidYN                             varchar(1)     Y|N
+    LastName                            varchar(100)
+    ForeName                            varchar(100)
+    Initials                            varchar(50)
+    Suffix                              varchar(250)
     CollectiveName                      mediumtext   # use CollectiveName when L.F.I.S all null
     Identifier                          mediumtext
     Identifier_Source                   varchar(20)
@@ -58,21 +58,21 @@ DataBankList[...]
     DataBankName                        varchar(50)
     AccessionNumber                     varchar(50)
 
-GrantList_CompleteYN                    varchar(1)     Y | N
+GrantList_CompleteYN                    varchar(1)     Y|N
 GrantList[...]
-    GrantID                             varchar(50)
-    Acronym                             varchar(50)
-    Agency                              varchar(50)
-    Country                             varchar(50)
+    GrantID                             mediumtext
+    Acronym                             varchar(100)
+    Agency                              mediumtext
+    Country                             varchar(100)
 
 PublicationTypeList
-    PublicationType_text                varchar(50)
+    PublicationType_text                varchar(255)
     PublicationType_UI                  varchar(50)
 
-ArticleDate_DateType                    varchar(10)    #FIXED "Electronic"
+ArticleDate_DateType                    varchar(10)    #FIXED Electronic
 ArticleDate                             varchar(8)     yyyymmdd
 MedlineJournalInfo_Country              varchar(50)
-MedlineJournalInfo_MedlineTA            varchar(250)
+MedlineJournalInfo_MedlineTA            varchar(255)
 MedlineJournalInfo_NlmUniqueID          unsigned int
 MedlineJournalInfo_ISSNLinking          varchar(10)
 
@@ -86,15 +86,15 @@ CitationSubset[...]
 
 CommentsCorrectionsList[...]
     RefType                             varchar(30)    enum
-    RefSource                           varchar(250)
+    RefSource                           varchar(255)
     PMID                                int
     Note                                mediumtext
 
 MeshHeadingList[...]
-    DescriptorName_text                 varchar(250)
+    DescriptorName_text                 varchar(255)
     DescriptorName_UI                   varchar(20)
     DescriptorName_MajorTopicYN         varchar(1)
-    QualifierName_text                  varchar(250)
+    QualifierName_text                  varchar(255)
     QualifierName_UI                    varchar(20)
     QualifierName_MajorTopicYN          varchar(1)
 
@@ -113,29 +113,30 @@ PublicationStatus_UI                    varchar(50)
 
 ArticleIdList[...]
     IdType                              varchar(20)    enum
-    ArticleId                           varchar(100)
+    ArticleId                           varchar(255)
 
 ArticleId_pubmed                        varchar(100)
 ArticleId_doi                           varchar(100)
 ArticleId_pmc                           varchar(100)
 
 KeywordList[...]
-    Keyword                             varchar(250)
-    MajorTopicYN                        varchar(1)     Y | N
+    Keyword                             mediumtext
+    MajorTopicYN                        varchar(1)     Y|N
     Owner                               varchar(10)    enum
 
 InvestigatorList[...]
-    LastName                            varchar(50)
-    ForeName                            varchar(50)
+    LastName                            varchar(100)
+    ForeName                            varchar(100)
     Initials                            varchar(50)
-    Suffix                              varchar(50)
+    Suffix                              varchar(250)
     Identifier                          mediumtext
     AffiliationInfo                     mediumtext
 
 ReferenceList[...]
-    Citation                            varchar(250)
+    Citation                            varchar(255)
     ArticleId_pmid                      int
 
+-------------------------------
 
 
 

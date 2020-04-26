@@ -8,18 +8,18 @@ Owner                                   varchar(10) NULL DEFAULT ""    COMMENT "
 DateCompleted                           varchar(8)   NULL DEFAULT ""   COMMENT "yyyymmdd",
 DateRevised                             varchar(8)  NULL DEFAULT ""    COMMENT "yyyymmdd",
 PubModel                                varchar(25)  NULL DEFAULT ""   COMMENT "enum",
-Journal_Title                           varchar(250) NULL DEFAULT "",
-Journal_ISOAbbreviation                 varchar(250) NULL DEFAULT "",
+Journal_Title                           varchar(255) NULL DEFAULT "",
+Journal_ISOAbbreviation                 varchar(255) NULL DEFAULT "",
 IssnType                                varchar(10)  NULL DEFAULT ""   COMMENT "(Electronic | Print)",
-ISSN                                    varchar(10)  NULL DEFAULT ""   COMMENT "enum",
+ISSN                                    varchar(10)  NULL DEFAULT "",
 CitedMedium                             varchar(10) NULL DEFAULT ""    COMMENT "(Internet | Print)",
-Issue                                   varchar(20)  NULL DEFAULT "",
-Volume                                  varchar(20)  NULL DEFAULT "",
+Issue                                   varchar(100)  NULL DEFAULT "",
+Volume                                  varchar(100)  NULL DEFAULT "",
 PubDate                                 varchar(8)  NULL DEFAULT ""    COMMENT "yyyymmdd",
 PubDate_Year                            smallint NULL DEFAULT "0",
 PubDate_Month                           tinyint NULL DEFAULT "0",
 MedlinePgn                              varchar(50) NULL DEFAULT "",
-ELocationID_pii                         varchar(100) NULL DEFAULT "",
+ELocationID_pii                         varchar(255) NULL DEFAULT "",
 ELocationID_doi                         varchar(100) NULL DEFAULT "",
 Abstract__cnt                   smallint NULL DEFAULT "0",
 CopyrightInformation                    mediumtext NULL,
@@ -32,7 +32,7 @@ PublicationTypeList__cnt               smallint NULL DEFAULT "0",
 ArticleDate_DateType                    varchar(10)  NULL DEFAULT ""   COMMENT "#FIXED Electronic",
 ArticleDate                             varchar(8)   NULL DEFAULT ""   COMMENT "yyyymmdd",
 MedlineJournalInfo_Country              varchar(50) NULL DEFAULT "",
-MedlineJournalInfo_MedlineTA            varchar(250) NULL DEFAULT "",
+MedlineJournalInfo_MedlineTA            varchar(255) NULL DEFAULT "",
 MedlineJournalInfo_NlmUniqueID          varchar(20) NULL DEFAULT "",
 MedlineJournalInfo_ISSNLinking          varchar(10) NULL DEFAULT "",
 ChemicalList__cnt               smallint NULL DEFAULT "0",
@@ -54,7 +54,7 @@ KeywordList__cnt                smallint NULL DEFAULT "0",
 InvestigatorList__cnt           smallint NULL DEFAULT "0",
 ReferenceList__cnt              smallint NULL DEFAULT "0",
 PRIMARY KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 
@@ -64,18 +64,18 @@ CREATE TABLE `pm_CitationSubset` (
     PMID                                    int unsigned NOT NULL DEFAULT "0",
     CitationSubset                          varchar(10) NULL DEFAULT "",
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_Abstract`;
 CREATE TABLE `pm_Abstract` (
     id                                  int NOT NULL AUTO_INCREMENT,
     PMID                                int unsigned NOT NULL DEFAULT "0",
-    Label                               varchar(250) NULL DEFAULT "",
+    Label                               varchar(255) NULL DEFAULT "",
     NlmCategory                         varchar(20)  NULL DEFAULT ""  COMMENT "enum",
     AbstractText                        mediumtext NULL,
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_AuthorList`;
@@ -83,16 +83,16 @@ CREATE TABLE `pm_AuthorList` (
     id                                  int NOT NULL AUTO_INCREMENT,
     PMID                                int unsigned NOT NULL DEFAULT "0",
     ValidYN                             varchar(1) NULL DEFAULT ""    COMMENT "Y|N",
-    LastName                            varchar(50) NULL DEFAULT "",
-    ForeName                            varchar(50) NULL DEFAULT "",
-    Initials                            varchar(20) NULL DEFAULT "",
-    Suffix                              varchar(20) NULL DEFAULT "",
+    LastName                            varchar(100) NULL DEFAULT "",
+    ForeName                            varchar(100) NULL DEFAULT "",
+    Initials                            varchar(50) NULL DEFAULT "",
+    Suffix                              varchar(50) NULL DEFAULT "",
     CollectiveName                      mediumtext NULL COMMENT "used when L.F.I.S all empty",
     Identifier                          mediumtext NULL,
     Identifier_Source                   varchar(20) NULL DEFAULT "",
     Affiliation                         mediumtext NULL,
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_DataBankList`;
@@ -102,29 +102,29 @@ CREATE TABLE `pm_DataBankList` (
     DataBankName                        varchar(50) NULL DEFAULT "",
     AccessionNumber                     varchar(50) NULL DEFAULT "",
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_GrantList`;
 CREATE TABLE `pm_GrantList` (
     id                                  int NOT NULL AUTO_INCREMENT,
     PMID                                int unsigned NOT NULL DEFAULT "0",
-    GrantID                             varchar(50) NULL DEFAULT "",
-    Acronym                             varchar(50) NULL DEFAULT "",
-    Agency                              varchar(250) NULL DEFAULT "",
-    Country                             varchar(50) NULL DEFAULT "",
+    GrantID                             varchar(255) NULL DEFAULT "",
+    Acronym                             varchar(100) NULL DEFAULT "",
+    Agency                              varchar(255) NULL DEFAULT "",
+    Country                             varchar(100) NULL DEFAULT "",
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_PublicationTypeList`;
 CREATE TABLE `pm_PublicationTypeList` (
     id                                  int NOT NULL AUTO_INCREMENT,
     PMID                                int unsigned NOT NULL DEFAULT "0",
-    PublicationType_text                varchar(50) NULL DEFAULT "",
+    PublicationType_text                varchar(255) NULL DEFAULT "",
     PublicationType_UI                  varchar(50) NULL DEFAULT "",
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_ChemicalList`;
@@ -133,34 +133,34 @@ CREATE TABLE `pm_ChemicalList` (
     PMID                                int unsigned NOT NULL DEFAULT "0",
     RegistryNumber                      varchar(50) NULL DEFAULT "",
     NameOfSubstance_UI                  varchar(50) NULL DEFAULT "",
-    NameOfSubstance_text                varchar(250) NULL DEFAULT "",
+    NameOfSubstance_text                varchar(255) NULL DEFAULT "",
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_CommentsCorrectionsList`;
 CREATE TABLE `pm_CommentsCorrectionsList` (
     id                                  int NOT NULL AUTO_INCREMENT,
     RefType                             varchar(30)  NULL DEFAULT "" COMMENT "enum",
-    RefSource                           varchar(250) NULL DEFAULT "",
+    RefSource                           varchar(255) NULL DEFAULT "",
     PMID                                int unsigned NULL DEFAULT "0",
     Note                                mediumtext NULL,
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_MeshHeadingList`;
 CREATE TABLE `pm_MeshHeadingList` (
     id                                  int NOT NULL AUTO_INCREMENT,
     PMID                                int unsigned NOT NULL DEFAULT "0",
-    DescriptorName_text                 varchar(250) NULL DEFAULT "",
+    DescriptorName_text                 varchar(255) NULL DEFAULT "",
     DescriptorName_UI                   varchar(20) NULL DEFAULT "",
     DescriptorName_MajorTopicYN         varchar(1) NULL DEFAULT "",
-    QualifierName_text                  varchar(250) NULL DEFAULT "",
+    QualifierName_text                  varchar(255) NULL DEFAULT "",
     QualifierName_UI                    varchar(20) NULL DEFAULT "",
     QualifierName_MajorTopicYN          varchar(1) NULL DEFAULT "",
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_History`;
@@ -170,7 +170,7 @@ CREATE TABLE `pm_History` (
     PubStatus                           varchar(20)  NULL DEFAULT ""   COMMENT "enum",
     date                                varchar(12)  NULL DEFAULT ""   COMMENT "yyyymmddhhii",
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT "PubmedData/History/PubMedPubDate" ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT "PubmedData/History/PubMedPubDate" ;
 
 
 drop TABLE IF exists `pm_ArticleIdList`;
@@ -178,44 +178,44 @@ CREATE TABLE `pm_ArticleIdList` (
     id                                  int NOT NULL AUTO_INCREMENT,
     PMID                                int unsigned NOT NULL DEFAULT "0",
     IdType                              varchar(20)  NULL DEFAULT ""  COMMENT "enum",
-    ArticleId                           varchar(100) NULL DEFAULT "" ,
+    ArticleId                           varchar(255) NULL DEFAULT "" ,
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_KeywordList`;
 CREATE TABLE `pm_KeywordList` (
     id                                  int NOT NULL AUTO_INCREMENT,
     PMID                                int unsigned NOT NULL DEFAULT "0",
-    Keyword                             varchar(250) NULL DEFAULT "" ,
+    Keyword                             mediumtext NULL,
     MajorTopicYN                        varchar(1) NULL DEFAULT ""  COMMENT "Y|N",
     Owner                               varchar(10) NULL DEFAULT ""  COMMENT "enum",
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_InvestigatorList`;
 CREATE TABLE `pm_InvestigatorList` (
     id                                  int NOT NULL AUTO_INCREMENT,
     PMID                                int unsigned NOT NULL DEFAULT "0",
-    LastName                            varchar(50) NULL DEFAULT "" ,
-    ForeName                            varchar(50) NULL DEFAULT "" ,
+    LastName                            varchar(100) NULL DEFAULT "" ,
+    ForeName                            varchar(100) NULL DEFAULT "" ,
     Initials                            varchar(50) NULL DEFAULT "" ,
-    Suffix                              varchar(50) NULL DEFAULT "" ,
+    Suffix                              varchar(250) NULL DEFAULT "" ,
     Identifier                          mediumtext NULL,
     AffiliationInfo                     mediumtext NULL,
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_ReferenceList`;
 CREATE TABLE `pm_ReferenceList` (
     id                                  int NOT NULL AUTO_INCREMENT,
     PMID                                int unsigned NOT NULL DEFAULT "0",
-    Citation                            varchar(250) NULL DEFAULT "" ,
+    Citation                            varchar(255) NULL DEFAULT "" ,
     ArticleId_pmid                      int NULL DEFAULT "0",
     PRIMARY KEY (id),KEY (PMID)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 
