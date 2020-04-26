@@ -663,8 +663,24 @@ class PersistenceBase():
         return None
 
     def save_sub(self,table,rows):
-        for row in rows:
-            self._save_one_sub(table,row)
+        # try save all rows once, or one-by-one if error occur
+        if len(rows)==0:
+            return None
+        val=rows[0]
+        sql="INSERT INTO `%s` (`%s`) VALUES(%s)"%(table
+                , '`, `'.join(val.keys())
+                , ', '.join([r'%s']*len(val))
+            )
+        try:
+            tmp=[[row[it] for it in row] for row in rows]
+            self.cursor.executemany(sql,tmp)
+            #print('@%s'%len(rows),end='',flush=True)
+        except:
+            #print(sql)
+            #print(tmp)
+            traceback.print_exc()
+            for row in rows:
+                self._save_one_sub(table,row)
         return None
 
     def _save_one_sub(self,table,values=OrderedDict()):
@@ -712,7 +728,8 @@ class PersistencePubmedArticle(PersistenceBase):
 
 
 # ------------------------------------------------------------------------------
-def parse_xml_and_convert(file_path,conn):
+# same as parse_xml_and_convert(), optimize for lower memory platform
+def parse_xml_and_convert_in_low_memory(file_path,conn):
     print("reading file: %s"%file_path)
     pers_article=PersistencePubmedArticle(conn)
     pma=EtPmaIter(file_path)
@@ -732,11 +749,41 @@ def parse_xml_and_convert(file_path,conn):
     print('\n%s lines converted\n'%i)
 
 
-def run_parse_xml_files(xml_files_path,conn):
+def parse_xml_and_convert(file_path,conn):
+    print("reading file: %s"%file_path)
+    if file_path.endswith('.gz'):
+        file=gzip.open(file_path,'rt')
+    else:
+        file=open(file_path,'r')
+    fet=ET.parse(file)
+    pma=fet.findall("./*")
+    pers_article=PersistencePubmedArticle(conn)
+    i=0
+    print('parsing...',end='',flush=True)
+    for art in pma:
+        psr=ParsePubmedDocument(art)
+        if psr.type=='PubmedArticle':
+            pers_article.persistence(psr.buff)
+            if i % 10000 == 0:
+                print("\n    %s  PMID=%s "%(i,psr.buff['PMID']),end='',flush=True)
+            elif i % 250 == 0:
+                print(".",end='',flush=True)
+        else:
+            raise Exception('UNKNOWN block: %s'%psr.type)
+        i+=1
+    print('\n%s lines converted\n'%i)
+
+
+
+
+def run_parse_xml_files(xml_files_path,conn,low_memory=False):
     files=glob.glob(xml_files_path)
     files.sort()
     for f in files:
-        parse_xml_and_convert(f,conn)
+        if low_memory:
+            parse_xml_and_convert_in_low_memory(f,conn)
+        else:
+            parse_xml_and_convert(f,conn)
 
 
 
@@ -744,12 +791,13 @@ def run_parse_xml_files(xml_files_path,conn):
 
 def start():
     file_path = config.xml_files_path
+    low_memory=config.low_memory
     conn=pymysql.connect(config.db_host
                         ,config.db_user
                         ,config.db_password
                         ,config.db_dbname
                         )
-    run_parse_xml_files(config.xml_files_path,conn)
+    run_parse_xml_files(config.xml_files_path,conn,low_memory)
 
 
 if __name__ == '__main__':
