@@ -1,6 +1,7 @@
 drop TABLE IF exists `pm_main`;
 
 CREATE TABLE `pm_main` (
+mid                                     int NOT NULL AUTO_INCREMENT,
 PMID                                    int unsigned NOT NULL,
 Status                                  varchar(20) NULL DEFAULT "" COMMENT "set",
 IndexingMethod                          varchar(20) NULL DEFAULT "",
@@ -53,105 +54,114 @@ ArticleId_pmc                           varchar(100) NULL DEFAULT "",
 KeywordList__cnt                smallint NULL DEFAULT "0",
 InvestigatorList__cnt           smallint NULL DEFAULT "0",
 ReferenceList__cnt              smallint NULL DEFAULT "0",
-PRIMARY KEY (PMID)
+PRIMARY KEY (`mid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 
 drop TABLE IF exists `pm_CitationSubset`;
 CREATE TABLE `pm_CitationSubset` (
-    id                                      int NOT NULL AUTO_INCREMENT,
-    PMID                                    int unsigned NOT NULL DEFAULT "0",
-    CitationSubset                          varchar(10) NULL DEFAULT "",
-    PRIMARY KEY (id),KEY (PMID)
+    id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
+    PMID                                int unsigned NOT NULL DEFAULT "0",
+    CitationSubset                      varchar(10) NULL DEFAULT "",
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_Abstract`;
 CREATE TABLE `pm_Abstract` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     Label                               varchar(255) NULL DEFAULT "",
     NlmCategory                         varchar(20)  NULL DEFAULT ""  COMMENT "set",
     AbstractText                        mediumtext NULL,
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_AuthorList`;
 CREATE TABLE `pm_AuthorList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     ValidYN                             varchar(1) NULL DEFAULT ""    COMMENT "Y | N",
     LastName                            varchar(100) NULL DEFAULT "",
     ForeName                            varchar(100) NULL DEFAULT "",
     Initials                            varchar(50) NULL DEFAULT "",
-    Suffix                              varchar(50) NULL DEFAULT "",
+    Suffix                              varchar(250) NULL DEFAULT "",
     CollectiveName                      mediumtext NULL COMMENT "used when L.F.I.S all empty",
     Identifier                          mediumtext NULL,
     Identifier_Source                   varchar(20) NULL DEFAULT "",
     Affiliation                         mediumtext NULL,
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_DataBankList`;
 CREATE TABLE `pm_DataBankList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     DataBankName                        varchar(50) NULL DEFAULT "",
     AccessionNumber                     varchar(50) NULL DEFAULT "",
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_GrantList`;
 CREATE TABLE `pm_GrantList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
-    GrantID                             varchar(255) NULL DEFAULT "",
+    GrantID                             mediumtext NULL,
     Acronym                             varchar(100) NULL DEFAULT "",
-    Agency                              varchar(255) NULL DEFAULT "",
+    Agency                              mediumtext NULL,
     Country                             varchar(100) NULL DEFAULT "",
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_PublicationTypeList`;
 CREATE TABLE `pm_PublicationTypeList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     PublicationType_text                varchar(255) NULL DEFAULT "",
     PublicationType_UI                  varchar(50) NULL DEFAULT "",
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_ChemicalList`;
 CREATE TABLE `pm_ChemicalList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     RegistryNumber                      varchar(50) NULL DEFAULT "",
     NameOfSubstance_UI                  varchar(50) NULL DEFAULT "",
     NameOfSubstance_text                varchar(255) NULL DEFAULT "",
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_CommentsCorrectionsList`;
 CREATE TABLE `pm_CommentsCorrectionsList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     RefType                             varchar(30)  NULL DEFAULT "" COMMENT "set",
     RefSource                           varchar(255) NULL DEFAULT "",
     PMID                                int unsigned NULL DEFAULT "0",
     Note                                mediumtext NULL,
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_MeshHeadingList`;
 CREATE TABLE `pm_MeshHeadingList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     DescriptorName_text                 varchar(255) NULL DEFAULT "",
     DescriptorName_UI                   varchar(20) NULL DEFAULT "",
@@ -159,44 +169,48 @@ CREATE TABLE `pm_MeshHeadingList` (
     QualifierName_text                  varchar(255) NULL DEFAULT "",
     QualifierName_UI                    varchar(20) NULL DEFAULT "",
     QualifierName_MajorTopicYN          varchar(1) NULL DEFAULT "",
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_History`;
 CREATE TABLE `pm_History` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     PubStatus                           varchar(20)  NULL DEFAULT ""   COMMENT "set",
     date                                varchar(12)  NULL DEFAULT ""   COMMENT "yyyymmddhhii",
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT "PubmedData/History/PubMedPubDate" ;
 
 
 drop TABLE IF exists `pm_ArticleIdList`;
 CREATE TABLE `pm_ArticleIdList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     IdType                              varchar(20)  NULL DEFAULT ""  COMMENT "set",
     ArticleId                           varchar(255) NULL DEFAULT "" ,
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_KeywordList`;
 CREATE TABLE `pm_KeywordList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     Keyword                             mediumtext NULL,
     MajorTopicYN                        varchar(1) NULL DEFAULT ""  COMMENT "Y | N",
     Owner                               varchar(10) NULL DEFAULT ""  COMMENT "set",
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_InvestigatorList`;
 CREATE TABLE `pm_InvestigatorList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     LastName                            varchar(100) NULL DEFAULT "" ,
     ForeName                            varchar(100) NULL DEFAULT "" ,
@@ -204,19 +218,54 @@ CREATE TABLE `pm_InvestigatorList` (
     Suffix                              varchar(250) NULL DEFAULT "" ,
     Identifier                          mediumtext NULL,
     AffiliationInfo                     mediumtext NULL,
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 drop TABLE IF exists `pm_ReferenceList`;
 CREATE TABLE `pm_ReferenceList` (
     id                                  int NOT NULL AUTO_INCREMENT,
+    mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     Citation                            varchar(255) NULL DEFAULT "" ,
     ArticleId_pmid                      int NULL DEFAULT "0",
-    PRIMARY KEY (id),KEY (PMID)
+    PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 
 
 
+/*
+-- Drop PMID index to make insert rows faster
+ALTER TABLE `pm_Abstract` DROP INDEX `PMID`;
+ALTER TABLE `pm_ArticleIdList` DROP INDEX `PMID`;
+ALTER TABLE `pm_AuthorList` DROP INDEX `PMID`;
+ALTER TABLE `pm_ChemicalList` DROP INDEX `PMID`;
+ALTER TABLE `pm_CitationSubset` DROP INDEX `PMID`;
+ALTER TABLE `pm_CommentsCorrectionsList` DROP INDEX `PMID`;
+ALTER TABLE `pm_DataBankList` DROP INDEX `PMID`;
+ALTER TABLE `pm_GrantList` DROP INDEX `PMID`;
+ALTER TABLE `pm_History` DROP INDEX `PMID`;
+ALTER TABLE `pm_InvestigatorList` DROP INDEX `PMID`;
+ALTER TABLE `pm_KeywordList` DROP INDEX `PMID`;
+ALTER TABLE `pm_MeshHeadingList` DROP INDEX `PMID`;
+ALTER TABLE `pm_PublicationTypeList` DROP INDEX `PMID`;
+ALTER TABLE `pm_ReferenceList` DROP INDEX `PMID`;
+
+-- readd index
+ALTER TABLE `pm_Abstract` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_ArticleIdList` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_AuthorList` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_ChemicalList` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_CitationSubset` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_CommentsCorrectionsList` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_DataBankList` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_GrantList` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_History` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_InvestigatorList` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_KeywordList` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_MeshHeadingList` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_PublicationTypeList` ADD INDEX ( `PMID` );
+ALTER TABLE `pm_ReferenceList` ADD INDEX ( `PMID` );
+
+*/
 

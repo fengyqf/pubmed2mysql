@@ -12,5 +12,5 @@ ignore_db_error = True
 #
 low_memory = False
 
-xml_files_path  = '/cygdrive/e/download/pubmed*.gz'
+xml_files_path  = ['/cygdrive/e/download/pubmed*.gz']
 

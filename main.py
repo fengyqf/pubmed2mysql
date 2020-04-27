@@ -638,8 +638,10 @@ class PersistenceBase():
                 sub[table]=values
             else:
                 main[key]=data[key]
-        self.save_main(main)
+        insert_id=self.save_main(main)
         for table in sub:
+            for i in range(len(sub[table])):
+                sub[table][i][self.fkey]=insert_id
             self.save_sub(table, sub[table])
         return None
 
@@ -649,18 +651,18 @@ class PersistenceBase():
                 , ', '.join([r'%s']*len(values))
             )
         val=[values[it] for it in values]
+        insert_id=0
         try:
             self.cursor.execute(sql,val)
-        except pymysql.err.IntegrityError:
-            self.clean_pmid(values['PMID'])
-            self.cursor.execute(sql,val)
+            self.cursor.execute("SELECT LAST_INSERT_ID()")
+            insert_id=self.cursor.fetchone()[0]
         except:
             print(sql)
             print(val)
             traceback.print_exc()
             if not config.ignore_db_error:
                 sys.exit()
-        return None
+        return insert_id
 
     def save_sub(self,table,rows):
         # try save all rows once, or one-by-one if error occur
@@ -700,6 +702,7 @@ class PersistenceBase():
         self.conn.commit()
         return None
 
+    # useless
     def clean_pmid(self,pmid):
         for table in self.sub_tables+[self.main_table]:
             sql="DELETE FROM %s WHERE `PMID`=%s"%(table,pmid)
@@ -715,6 +718,7 @@ class PersistenceBase():
 
 class PersistencePubmedArticle(PersistenceBase):
     prefix='pm_'
+    fkey='mid'      # foreign key of sub-table
     subs=['Abstract','AuthorList','DataBankList','GrantList'
         ,'PublicationTypeList','ChemicalList','CitationSubset'
         ,'CommentsCorrectionsList','MeshHeadingList','History','ArticleIdList'
@@ -777,13 +781,16 @@ def parse_xml_and_convert(file_path,conn):
 
 
 def run_parse_xml_files(xml_files_path,conn,low_memory=False):
-    files=glob.glob(xml_files_path)
-    files.sort()
-    for f in files:
-        if low_memory:
-            parse_xml_and_convert_in_low_memory(f,conn)
-        else:
-            parse_xml_and_convert(f,conn)
+    if isinstance(xml_files_path,str):
+        xml_files_path=[xml_files_path]
+    for i in range(len(xml_files_path)):
+        files=glob.glob(xml_files_path[i])
+        files.sort()
+        for f in files:
+            if low_memory:
+                parse_xml_and_convert_in_low_memory(f,conn)
+            else:
+                parse_xml_and_convert(f,conn)
 
 
 
