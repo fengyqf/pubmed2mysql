@@ -616,11 +616,12 @@ class ParsePubmedDocument():
 
 
 class PersistenceBase():
-    def __init__(self, conn):
+    def __init__(self, conn, delayed=False):
         self.conn=conn
         self.cursor=conn.cursor()
         self.cursor.execute('SELECT DATABASE()')
         self.db=self.cursor.fetchone()[0]
+        self.delayed="DELAYED " if delayed else ""
 
     def persistence(self,data):
         # main table values; and cache all sub table values
@@ -643,6 +644,7 @@ class PersistenceBase():
             for i in range(len(sub[table])):
                 sub[table][i][self.fkey]=insert_id
             self.save_sub(table, sub[table])
+        self.conn.commit()
         return None
 
     def save_main(self,values):
@@ -669,14 +671,13 @@ class PersistenceBase():
         if len(rows)==0:
             return None
         val=rows[0]
-        sql="INSERT INTO `%s` (`%s`) VALUES(%s)"%(table
+        sql="INSERT %s INTO `%s` (`%s`) VALUES(%s)"%(self.delayed, table
                 , '`, `'.join(val.keys())
                 , ', '.join([r'%s']*len(val))
             )
         try:
             tmp=[[row[it] for it in row] for row in rows]
             self.cursor.executemany(sql,tmp)
-            #print('@%s'%len(rows),end='',flush=True)
         except:
             #print(sql)
             #print(tmp)
@@ -686,7 +687,7 @@ class PersistenceBase():
         return None
 
     def _save_one_sub(self,table,values=OrderedDict()):
-        sql="INSERT INTO `%s` (`%s`) VALUES(%s)"%(table
+        sql="INSERT %s INTO `%s` (`%s`) VALUES(%s)"%(self.delayed, table
                 , '`, `'.join(values.keys())
                 , ', '.join([r'%s']*len(values))
             )
@@ -708,6 +709,7 @@ class PersistenceBase():
             pmid=[pmid]
         for it in pmid:
             cnt += self._clean_pmid(it)
+        self.conn.commit()
         return cnt
 
     def _clean_pmid(self,pmid):
@@ -735,6 +737,7 @@ class PersistenceBase():
             values={'PMID':pmid, self.mark_deletion_column:'_DELETE_'}
             self.save_main(values)
             cnt+=1
+        self.conn.commit()
         return cnt
 
 
@@ -743,13 +746,14 @@ class PersistencePubmedArticle(PersistenceBase):
     prefix='pm_'
     fkey='mid'      # foreign key of sub-table
     mark_deletion_column='Status'
+    delayed=''      # INSERT DELAYED ...
     subs=['Abstract','AuthorList','DataBankList','GrantList'
         ,'PublicationTypeList','ChemicalList','CitationSubset'
         ,'CommentsCorrectionsList','MeshHeadingList','History','ArticleIdList'
         ,'KeywordList','InvestigatorList','ReferenceList'
         ]
-    def __init__(self, conn):
-        super(PersistencePubmedArticle, self).__init__(conn)
+    def __init__(self, conn, delayed=False):
+        super(PersistencePubmedArticle, self).__init__(conn, delayed)
         self.main_table="%smain"%self.prefix
         self.sub_tables=["%s%s"%(self.prefix,it) for it in self.subs]
 
@@ -793,7 +797,8 @@ def parse_xml_and_convert(file_path,conn):
 
 
 def parse_pma_and_persistence(pma,conn):
-    pers_article=PersistencePubmedArticle(conn)
+    delayed=config.delayed_insert
+    pers_article=PersistencePubmedArticle(conn,delayed=delayed)
     i=0
     print('parsing...',end='',flush=True)
     for art in pma:

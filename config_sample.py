@@ -21,6 +21,9 @@ low_memory = False
 # you must delete the previous line with the pmid
 pm_deletion = 'delete'
 
+# INSERT DELAYED... in sub-tables
+insert_delayed = True
+
 
 xml_files_path  = ['/cygdrive/e/download/pubmed*.gz']
 
