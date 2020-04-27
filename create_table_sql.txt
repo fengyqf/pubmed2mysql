@@ -105,7 +105,7 @@ CREATE TABLE `pm_DataBankList` (
     mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
     DataBankName                        varchar(50) NULL DEFAULT "",
-    AccessionNumber                     varchar(50) NULL DEFAULT "",
+    AccessionNumber                     varchar(100) NULL DEFAULT "",
     PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
 

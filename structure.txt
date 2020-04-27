@@ -56,7 +56,7 @@ Language                                varchar(10)
 
 DataBankList[...]
     DataBankName                        varchar(50)
-    AccessionNumber                     varchar(50)
+    AccessionNumber                     varchar(100)
 
 GrantList_CompleteYN                    varchar(1)     Y|N
 GrantList[...]
