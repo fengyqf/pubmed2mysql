@@ -702,23 +702,47 @@ class PersistenceBase():
         self.conn.commit()
         return None
 
-    # useless
     def clean_pmid(self,pmid):
+        cnt=0
+        if not isinstance(pmid,list):
+            pmid=[pmid]
+        for it in pmid:
+            cnt += self._clean_pmid(it)
+        return cnt
+
+    def _clean_pmid(self,pmid):
+        cnt=0
         for table in self.sub_tables+[self.main_table]:
             sql="DELETE FROM %s WHERE `PMID`=%s"%(table,pmid)
             try:
-                self.cursor.execute(sql)
+                cnt += self.cursor.execute(sql)
             except:
                 print(sql)
                 traceback.print_exc()
                 sys.exit()
-        return None
+        return cnt
+
+    def mark_delete(self,pmid):
+        '''
+        ids=pmid if not isinstance(pmid,list) else ', '.join(pmid)
+        sql="UPDATE %s SET `%s`='_DELETE_' WHERE `PMID` IN (%s)"%(
+                self.main_table, self.mark_deletion_column, ids)
+        return self.cursor.execute(sql)
+        '''
+        cnt=0
+        ids=[pmid] if not isinstance(pmid,list) else pmid
+        for pmid in ids:
+            values={'PMID':pmid, self.mark_deletion_column:'_DELETE_'}
+            self.save_main(values)
+            cnt+=1
+        return cnt
 
 
 
 class PersistencePubmedArticle(PersistenceBase):
     prefix='pm_'
     fkey='mid'      # foreign key of sub-table
+    mark_deletion_column='Status'
     subs=['Abstract','AuthorList','DataBankList','GrantList'
         ,'PublicationTypeList','ChemicalList','CitationSubset'
         ,'CommentsCorrectionsList','MeshHeadingList','History','ArticleIdList'
@@ -735,22 +759,26 @@ class PersistencePubmedArticle(PersistenceBase):
 # same as parse_xml_and_convert(), optimize for lower memory platform
 def parse_xml_and_convert_in_low_memory(file_path,conn):
     print("reading file: %s"%file_path)
-    pers_article=PersistencePubmedArticle(conn)
     pma=EtPmaIter(file_path)
+    parse_pma_and_persistence(pma,conn)
+
+'''
+    pers_article=PersistencePubmedArticle(conn)
     i=0
     print('parsing...',end='',flush=True)
     for art in pma:
+        if i % 10000 == 0:
+            print("\n    %s  PMID=%s "%(i,psr.buff['PMID']),end='',flush=True)
+        elif i % 250 == 0:
+            print(".",end='',flush=True)
         psr=ParsePubmedDocument(art)
         if psr.type=='PubmedArticle':
             pers_article.persistence(psr.buff)
-            if i % 10000 == 0:
-                print("\n    %s  PMID=%s "%(i,psr.buff['PMID']),end='',flush=True)
-            elif i % 250 == 0:
-                print(".",end='',flush=True)
         else:
             raise Exception('UNKNOWN block: %s'%psr.type)
         i+=1
     print('\n%s lines converted\n'%i)
+'''
 
 
 def parse_xml_and_convert(file_path,conn):
@@ -761,6 +789,10 @@ def parse_xml_and_convert(file_path,conn):
         file=open(file_path,'r')
     fet=ET.parse(file)
     pma=fet.findall("./*")
+    parse_pma_and_persistence(pma,conn)
+
+
+def parse_pma_and_persistence(pma,conn):
     pers_article=PersistencePubmedArticle(conn)
     i=0
     print('parsing...',end='',flush=True)
@@ -768,12 +800,24 @@ def parse_xml_and_convert(file_path,conn):
         psr=ParsePubmedDocument(art)
         if psr.type=='PubmedArticle':
             pers_article.persistence(psr.buff)
-            if i % 10000 == 0:
-                print("\n    %s  PMID=%s "%(i,psr.buff['PMID']),end='',flush=True)
-            elif i % 250 == 0:
-                print(".",end='',flush=True)
+        elif psr.type=='DeleteCitation':
+            pmid=psr.buff['PMID']
+            cnt=0
+            if config.pm_deletion=='markline':  # markline
+                cnt=pers_article.mark_delete(pmid)
+                print('^%s'%(cnt),end='',flush=True)
+            elif config.pm_deletion!='ignore':  # delete
+                cnt=pers_article.clean_pmid(pmid)
+                print('-%s'%(cnt),end='',flush=True)
+            else:
+                pass                            # ignore
         else:
             raise Exception('UNKNOWN block: %s'%psr.type)
+        # output progress
+        if i % 10000 == 0:
+            print("\n    %s  PMID=%s "%(i,psr.buff['PMID']),end='',flush=True)
+        elif i % 250 == 0:
+            print(".",end='',flush=True)
         i+=1
     print('\n%s lines converted\n'%i)
 
