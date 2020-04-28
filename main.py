@@ -628,12 +628,15 @@ class ParsePubmedDocument():
 
 
 class PersistenceBase():
-    def __init__(self, conn, delayed=False):
+    def __init__(self, conn, delayed=False, truncate_exceed=False):
         self.conn=conn
         self.cursor=conn.cursor()
         self.cursor.execute('SELECT DATABASE()')
         self.db=self.cursor.fetchone()[0]
         self.delayed="DELAYED " if delayed else ""
+        self.truncate_exceed=truncate_exceed
+        # clmlen={'table-1':{'column-1':10,'clm-2':50,...}, 'table-2':{...}, ...}
+        self.clmlen={}
 
     def persistence(self,data):
         # main table values; and cache all sub table values
@@ -660,6 +663,8 @@ class PersistenceBase():
         return None
 
     def save_main(self,values):
+        if self.truncate_exceed:
+            values=self.truncate_val(self.main_table,values)
         sql="INSERT INTO `%s` (`%s`) VALUES(%s)"%(self.main_table
                 , '`, `'.join(values.keys())
                 , ', '.join([r'%s']*len(values))
@@ -690,15 +695,18 @@ class PersistenceBase():
         try:
             tmp=[[row[it] for it in row] for row in rows]
             self.cursor.executemany(sql,tmp)
-        except:
-            #print(sql)
-            #print(tmp)
-            traceback.print_exc()
+        except pymysql.err.DataError:
             for row in rows:
                 self._save_one_sub(table,row)
+        except:
+            traceback.print_exc()
+            if not config.ignore_db_error:
+                sys.exit()
         return None
 
     def _save_one_sub(self,table,values=OrderedDict()):
+        if self.truncate_exceed:
+            values=self.truncate_val(table,values)
         sql="INSERT %s INTO `%s` (`%s`) VALUES(%s)"%(self.delayed, table
                 , '`, `'.join(values.keys())
                 , ', '.join([r'%s']*len(values))
@@ -757,6 +765,36 @@ class PersistenceBase():
         self.conn.commit()
         return cnt
 
+    def reload_column_length(self,table):
+        self.clmlen[table]={}
+        sql="SELECT `COLUMN_NAME`,`CHARACTER_MAXIMUM_LENGTH`,`DATA_TYPE`,\
+            `IS_NULLABLE`,`COLUMN_DEFAULT` FROM INFORMATION_SCHEMA.`COLUMNS` \
+            WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME='%s'"%(self.db,table)
+        self.cursor.execute(sql)
+        for row in self.cursor.fetchall():
+            if row[2]=='varchar':
+                self.clmlen[table][row[0]] = row[1]
+            elif row[2] in ['int','smallint','bigint']:
+                self.clmlen[table][row[0]] = -1     # hacking: -1 for int value
+            else:
+                pass
+        return None
+
+    def truncate_val(self,table,values):
+        lens=self.clmlen[table]
+        for key in values:
+            if key in lens and values[key]!=None:
+                g=lens[key]
+                if g > 0:
+                    values[key]=values[key][:g]
+                elif g == -1:
+                    try:
+                        values[key]=int(values[key])
+                    except:
+                        values[key]=0
+                else:
+                    pass
+        return values
 
 
 class PersistencePubmedArticle(PersistenceBase):
@@ -770,12 +808,16 @@ class PersistencePubmedArticle(PersistenceBase):
         ,'KeywordList','InvestigatorList','ReferenceList'
         ]
     vers=['main','CommentsCorrectionsList']     # tables with PMID Version
-    def __init__(self, conn, delayed=False):
-        super(PersistencePubmedArticle, self).__init__(conn, delayed)
+    def __init__(self, conn, delayed=False, truncate_exceed=False):
+        super(PersistencePubmedArticle, self).__init__(conn, delayed, truncate_exceed)
         self.main_table="%smain"%self.prefix
         self.sub_tables=["%s%s"%(self.prefix,it) for it in self.subs]
         self.ver_tables=["%s%s"%(self.prefix,it) for it in self.vers]
+        self.reload_all_column_length()
 
+    def reload_all_column_length(self):
+        for table in self.sub_tables + [self.main_table]:
+            self.reload_column_length(table)
 
 
 # ------------------------------------------------------------------------------
@@ -817,7 +859,8 @@ def parse_xml_and_convert(file_path,conn):
 
 def parse_pma_and_persistence(pma,conn):
     delayed=config.delayed_insert
-    pers_article=PersistencePubmedArticle(conn,delayed=delayed)
+    truncate_exceed=config.truncate_exceed
+    pers_article=PersistencePubmedArticle(conn,delayed=delayed,truncate_exceed=truncate_exceed)
     i=0
     print('parsing...',end='',flush=True)
     for art in pma:
@@ -839,11 +882,13 @@ def parse_pma_and_persistence(pma,conn):
             raise Exception('UNKNOWN block: %s'%psr.type)
         # output progress
         if i % 10000 == 0:
-            print("\n    %s  PMID=%s "%(i,psr.buff['PMID']),end='',flush=True)
+            tmp=psr.buff['PMID'] if 'PMID' in psr.buff else ''
+            print("\n    %s  PMID=%s "%(i,tmp),end='',flush=True)
+            pers_article.reload_all_column_length()
         elif i % 250 == 0:
             print(".",end='',flush=True)
         i+=1
-    print('\n%s lines converted\n'%i)
+    print('\n%s lines\n'%i)
 
 
 

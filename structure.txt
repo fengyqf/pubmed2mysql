@@ -18,6 +18,7 @@ Owner                                   varchar(10)    enum
 DateCompleted                           varchar(8)     yyyymmdd
 DateRevised                             varchar(8)     yyyymmdd
 
+ArticleTitle                            mediumtext
 PubModel                                varchar(25)    enum
 Journal_Title                           varchar(255)
 Journal_ISOAbbreviation                 varchar(255)
