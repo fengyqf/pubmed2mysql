@@ -3,6 +3,7 @@ drop TABLE IF exists `pm_main`;
 CREATE TABLE `pm_main` (
 mid                                     int NOT NULL AUTO_INCREMENT,
 PMID                                    int unsigned NOT NULL,
+Version                                 smallint NULL DEFAULT "0",
 Status                                  varchar(20) NULL DEFAULT "" COMMENT "enum",
 IndexingMethod                          varchar(20) NULL DEFAULT "",
 Owner                                   varchar(10) NULL DEFAULT ""    COMMENT "enum",
@@ -153,6 +154,7 @@ CREATE TABLE `pm_CommentsCorrectionsList` (
     RefType                             varchar(30)  NULL DEFAULT "" COMMENT "enum",
     RefSource                           varchar(255) NULL DEFAULT "",
     PMID                                int unsigned NULL DEFAULT "0",
+    Version                             smallint NULL DEFAULT "0",
     Note                                mediumtext NULL,
     PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
