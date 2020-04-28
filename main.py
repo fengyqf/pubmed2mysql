@@ -207,11 +207,13 @@ class ParseSinglePubmedArticle(ParseSingleBase):
 
     def parse(self):
         self.parse_single('.//MedlineCitation/PMID','text','PMID')
+        self.parse_single('.//MedlineCitation/PMID','@Version','Version')
         self.parse_single('.//MedlineCitation','@Status','Status')
         self.parse_single('.//MedlineCitation','@IndexingMethod','IndexingMethod')
         self.parse_single('.//MedlineCitation','@Owner','Owner')
         self.parse_MedlineCitation_date()
         self.parse_single('.//MedlineCitation/Article','@PubModel','PubModel')
+        self.parse_one('.//MedlineCitation/Article/ArticleTitle','text','ArticleTitle')
         self.parse_Journal()
         # seems almost/all Pagination uses MedlinePgn, so ignore StartPage/EndPage
         #self.parse_one('.//MedlineCitation/Article/Pagination/StartPage','text','StartPage')
@@ -398,6 +400,7 @@ class ParseSinglePubmedArticle(ParseSingleBase):
             tmp['RefType']=ele[i].attrib['RefType'] if 'RefType' in ele[i].attrib else ''
             tmp['RefSource']=self.find_one_in_ele(ele[i],'./RefSource','text')
             tmp['PMID']=self.find_one_in_ele(ele[i],'./PMID','text')
+            tmp['Version']=self.find_one_in_ele(ele[i],'./PMID','@Version')
             tmp['Note']=self.find_one_in_ele(ele[i],'./Note','text')
             self.buff['CommentsCorrectionsList'].append(tmp)
         return None
@@ -570,8 +573,17 @@ class ParseSingleDeleteCitation(ParseSingleBase):
         #self.xet=xet
 
     def parse(self):
-        self.parse_many('.//PMID','text','PMID')
-        return self.buff
+        ele=self.xet.findall(r'.//PMID')
+        rtn=[]
+        for i in range(len(ele)):
+            Version=ele[i].attrib['Version'] if 'Version' in ele[i].attrib else '1'
+            tmp={
+                'PMID':ele[i].text,
+                'Version': Version
+            }
+            rtn.append(tmp)
+        self.buff['DeleteCitation']=rtn
+        return rtn
 
 
 # parse <DeleteCitation>
@@ -703,19 +715,21 @@ class PersistenceBase():
         self.conn.commit()
         return None
 
-    def clean_pmid(self,pmid):
+    def clean_pmid(self,delpms):
         cnt=0
-        if not isinstance(pmid,list):
-            pmid=[pmid]
-        for it in pmid:
+        if not isinstance(delpms,list):
+            delpms=[delpms]
+        for it in delpms:
             cnt += self._clean_pmid(it)
         self.conn.commit()
         return cnt
 
     def _clean_pmid(self,pmid):
         cnt=0
+        part=" AND `Version`=%s"%(pmid['Version'])
         for table in self.sub_tables+[self.main_table]:
-            sql="DELETE FROM %s WHERE `PMID`=%s"%(table,pmid)
+            sql="DELETE FROM `%s` WHERE `PMID`=%s%s"%(table,pmid['PMID']
+                ,part if table in self.ver_tables else "")
             try:
                 cnt += self.cursor.execute(sql)
             except:
@@ -724,7 +738,7 @@ class PersistenceBase():
                 sys.exit()
         return cnt
 
-    def mark_delete(self,pmid):
+    def mark_delete(self,delpms):
         '''
         ids=pmid if not isinstance(pmid,list) else ', '.join(pmid)
         sql="UPDATE %s SET `%s`='_DELETE_' WHERE `PMID` IN (%s)"%(
@@ -732,9 +746,12 @@ class PersistenceBase():
         return self.cursor.execute(sql)
         '''
         cnt=0
-        ids=[pmid] if not isinstance(pmid,list) else pmid
+        ids=[delpms] if not isinstance(delpms,list) else delpms
         for pmid in ids:
-            values={'PMID':pmid, self.mark_deletion_column:'_DELETE_'}
+            values={'PMID':pmid['PMID'],
+                    'Version':pmid['Version'],
+                    self.mark_deletion_column:'_DELETE_'
+                    }
             self.save_main(values)
             cnt+=1
         self.conn.commit()
@@ -752,10 +769,12 @@ class PersistencePubmedArticle(PersistenceBase):
         ,'CommentsCorrectionsList','MeshHeadingList','History','ArticleIdList'
         ,'KeywordList','InvestigatorList','ReferenceList'
         ]
+    vers=['main','CommentsCorrectionsList']     # tables with PMID Version
     def __init__(self, conn, delayed=False):
         super(PersistencePubmedArticle, self).__init__(conn, delayed)
         self.main_table="%smain"%self.prefix
         self.sub_tables=["%s%s"%(self.prefix,it) for it in self.subs]
+        self.ver_tables=["%s%s"%(self.prefix,it) for it in self.vers]
 
 
 
@@ -806,13 +825,13 @@ def parse_pma_and_persistence(pma,conn):
         if psr.type=='PubmedArticle':
             pers_article.persistence(psr.buff)
         elif psr.type=='DeleteCitation':
-            pmid=psr.buff['PMID']
+            delpms=psr.buff['DeleteCitation']
             cnt=0
             if config.pm_deletion=='markline':  # markline
-                cnt=pers_article.mark_delete(pmid)
+                cnt=pers_article.mark_delete(delpms)
                 print('^%s'%(cnt),end='',flush=True)
             elif config.pm_deletion!='ignore':  # delete
-                cnt=pers_article.clean_pmid(pmid)
+                cnt=pers_article.clean_pmid(delpms)
                 print('-%s'%(cnt),end='',flush=True)
             else:
                 pass                            # ignore

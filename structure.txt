@@ -9,6 +9,7 @@ all element parsed to flat variables, or list[...] contains OrderedDict, or list
 
 -------------------------------
 PMID                                    int
+Version                                 smallint
 
 Status                                  varchar(20)    set
 IndexingMethod                          varchar(20)
@@ -88,6 +89,7 @@ CommentsCorrectionsList[...]
     RefType                             varchar(30)    set
     RefSource                           varchar(255)
     PMID                                int
+    Version                             smallint
     Note                                mediumtext
 
 MeshHeadingList[...]
