@@ -18,6 +18,7 @@ Owner                                   varchar(10)    set
 DateCompleted                           varchar(8)     yyyymmdd
 DateRevised                             varchar(8)     yyyymmdd
 
+ArticleTitle                            mediumtext
 PubModel                                varchar(25)    set
 Journal_Title                           varchar(255)
 Journal_ISOAbbreviation                 varchar(255)

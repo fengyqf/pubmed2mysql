@@ -24,6 +24,9 @@ pm_deletion = 'delete'
 # INSERT DELAYED... in sub-tables
 insert_delayed = True
 
+# truncate exceed data if pymysql.err.DataError
+truncate_exceed = True
+
 
 xml_files_path  = ['/cygdrive/e/download/pubmed*.gz']
 
