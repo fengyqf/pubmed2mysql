@@ -16,7 +16,7 @@ Journal_ISOAbbreviation                 varchar(255) NULL DEFAULT "",
 IssnType                                varchar(10)  NULL DEFAULT ""   COMMENT "(Electronic | Print)",
 ISSN                                    varchar(10)  NULL DEFAULT "",
 CitedMedium                             varchar(10) NULL DEFAULT ""    COMMENT "(Internet | Print)",
-Issue                                   varchar(100)  NULL DEFAULT "",
+Issue                                   mediumtext  NULL,
 Volume                                  varchar(100)  NULL DEFAULT "",
 PubDate                                 varchar(8)  NULL DEFAULT ""    COMMENT "yyyymmdd",
 PubDate_Year                            smallint NULL DEFAULT "0",
@@ -230,7 +230,7 @@ CREATE TABLE `pm_ReferenceList` (
     id                                  int NOT NULL AUTO_INCREMENT,
     mid                                 int NOT NULL DEFAULT "0",
     PMID                                int unsigned NOT NULL DEFAULT "0",
-    Citation                            varchar(255) NULL DEFAULT "" ,
+    Citation                            mediumtext NULL,
     ArticleId_pmid                      int NULL DEFAULT "0",
     PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ;
