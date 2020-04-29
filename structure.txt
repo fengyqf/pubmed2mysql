@@ -20,12 +20,13 @@ DateRevised                             varchar(8)     yyyymmdd
 
 ArticleTitle                            mediumtext
 PubModel                                varchar(25)    enum
+
 Journal_Title                           varchar(255)
 Journal_ISOAbbreviation                 varchar(255)
 IssnType                                varchar(10)    (Electronic | Print)
 ISSN                                    varchar(10)
 CitedMedium                             varchar(10)    (Internet | Print)
-Issue                                   varchar(100)
+Issue                                   mediumtext
 Volume                                  varchar(100)
 
 PubDate                                 varchar(8)     yyyymmdd
@@ -136,7 +137,7 @@ InvestigatorList[...]
     AffiliationInfo                     mediumtext
 
 ReferenceList[...]
-    Citation                            varchar(255)
+    Citation                            mediumtext
     ArticleId_pmid                      int
 
 -------------------------------
