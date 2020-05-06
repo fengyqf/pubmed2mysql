@@ -281,7 +281,10 @@ class ParseSinglePubmedArticle(ParseSingleBase):
             'Spring':'02','Summer':'05','Fall':'08','Winter':'11','Autumn':'08',
             'Jan':'1', 'Feb':'2', 'Mar':'3', 'Apr':'4', 
             'May':'5', 'Jun':'6', 'Jul':'7', 'Aug':'8', 
-            'Sep':'9', 'Oct':'10', 'Nov':'11', 'Dec':'12'}
+            'Sep':'9', 'Oct':'10', 'Nov':'11', 'Dec':'12',
+            'January':'1', 'February':'2', 'March':'3', 'April':'4',
+            'May':'5', 'June':'6', 'July':'7', 'August':'8',
+            'September':'9','October':'10', 'November':'11', 'December':'12'}
         if self.buff['PubDate_Season'] != None:
             if self.buff['PubDate_Season'] in mapping_month:
                 self.buff['PubDate_Month']=mapping_month[self.buff['PubDate_Season']]
@@ -302,9 +305,12 @@ class ParseSinglePubmedArticle(ParseSingleBase):
         # convert PubDate_Month to numeric
         if self.buff['PubDate_Month'] in mapping_month:
             self.buff['PubDate_Month']=mapping_month[self.buff['PubDate_Month']]
-        year='0000' if self.buff['PubDate_Year']==None else self.buff['PubDate_Year']
-        month='00' if self.buff['PubDate_Month']==None else self.buff['PubDate_Month']
-        day = '00' if self.buff['PubDate_Day']==None else self.buff['PubDate_Day']
+        year='0000' if self.buff['PubDate_Year']==None or not self.buff['PubDate_Year'].isnumeric() \
+                else self.buff['PubDate_Year']
+        month='00' if self.buff['PubDate_Month']==None or not self.buff['PubDate_Month'].isnumeric() \
+                else self.buff['PubDate_Month']
+        day = '00' if self.buff['PubDate_Day']==None   or not self.buff['PubDate_Day'].isnumeric() \
+                else self.buff['PubDate_Day']
         self.buff['PubDate']='%s%s%s'%(year.zfill(4),month.zfill(2),day.zfill(2))
         # keep Year/Month, drop other sub-elements of PubDate
         del self.buff['PubDate_Day']
