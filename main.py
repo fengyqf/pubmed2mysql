@@ -465,9 +465,9 @@ class ParseSinglePubmedArticle(ParseSingleBase):
         for it in dts:
             if it['IdType']=='pubmed':
                 self.buff['ArticleId_pubmed']=it['ArticleId']
-            if it['IdType']=='medline':
+            if it['IdType']=='doi':
                 self.buff['ArticleId_doi']=it['ArticleId']
-            if it['IdType']=='entrez':
+            if it['IdType']=='pmc':
                 self.buff['ArticleId_pmc']=it['ArticleId']
         return None
 
