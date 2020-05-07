@@ -243,7 +243,6 @@ class ParseSinglePubmedArticle(ParseSingleBase):
         self.parse_one('.//MedlineCitation/CoiStatement','text','CoiStatement')
         self.parse_History_date()
         self.parse_one('.//PubmedData/PublicationStatus','text','PublicationStatus')
-        self.parse_one('.//PubmedData/PublicationStatus','@UI','PublicationStatus_UI')
         self.parse_ArticleIdList()
         self.parse_KeywordList()
         self.parse_InvestigatorList()

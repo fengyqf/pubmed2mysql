@@ -113,7 +113,6 @@ PubMedPubDate_medline                   varchar(12)    yyyymmddhhii
 PubMedPubDate_entrez                    varchar(12)    yyyymmddhhii
 
 PublicationStatus                       varchar(50)
-PublicationStatus_UI                    varchar(50)
 
 ArticleIdList[...]
     IdType                              varchar(20)    enum

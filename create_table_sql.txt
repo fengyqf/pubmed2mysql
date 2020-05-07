@@ -48,7 +48,6 @@ PubMedPubDate_pubmed                    varchar(12)  NULL DEFAULT ""   COMMENT "
 PubMedPubDate_medline                   varchar(12)  NULL DEFAULT ""   COMMENT "yyyymmddhhii",
 PubMedPubDate_entrez                    varchar(12)  NULL DEFAULT ""   COMMENT "yyyymmddhhii",
 PublicationStatus                       varchar(50) NULL DEFAULT "",
-PublicationStatus_UI                    varchar(50) NULL DEFAULT "",
 ArticleIdList__cnt              smallint NULL DEFAULT "0",
 ArticleId_pubmed                        varchar(100) NULL DEFAULT "",
 ArticleId_doi                           varchar(100) NULL DEFAULT "",
